@@ -1,0 +1,4 @@
+Yapsy==1.11.223
+click==6.6
+gfwlist2pac==1.1.3
+Jinja2==2.3

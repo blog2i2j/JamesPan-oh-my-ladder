@@ -1,0 +1,9 @@
+[Core]
+Name = SSH Proxy as a Ladder
+Module = ssh_proxy
+
+[Documentation]
+Description = SSH Proxy as a Ladder
+Author = James Pan
+Version = 1.0
+Website = https://codinn.com/products/ssh-proxy/

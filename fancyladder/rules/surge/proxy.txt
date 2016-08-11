@@ -1,0 +1,8 @@
+[Proxy]
+HK = https,adc-hk.com,443,username,password,tls=true
+SG = https,adc-sg.com,443,username,password,tls=true
+
+[Proxy Group]
+Auto = url-test, HK, SG, url = http://www.gstatic.com/generate_204
+Proxy = select, DIRECT, HK, SG
+Direct = select, DIRECT, HK, SG

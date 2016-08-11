@@ -1,0 +1,13 @@
+# user
+{% for domain in user_rule %}
+DOMAIN-KEYWORD,{{ domain }},Proxy,force-remote-dns
+{% endfor %}
+
+DOMAIN-SUFFIX,evernote.com,Proxy,force-remote-dns
+DOMAIN-SUFFIX,yinxiang.com,Proxy,force-remote-dns
+
+# gfwlist
+
+{% for domain in gfwlist %}
+DOMAIN-KEYWORD,{{ domain }},Proxy,force-remote-dns
+{% endfor %}

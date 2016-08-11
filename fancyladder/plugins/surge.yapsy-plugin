@@ -1,0 +1,9 @@
+[Core]
+Name = Surge as a Ladder
+Module = surge
+
+[Documentation]
+Description = Surge as a Ladder
+Author = James Pan
+Version = 1.0
+Website = http://surge.run/
