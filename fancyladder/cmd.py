@@ -23,7 +23,7 @@ def copy(force, dst):
     base_copy(common.DEFAULT_RULE_PATH, dst, force, '%s already exist, use -f flag to force overwrite' % dst)
 
 
-@rule.command('rule-update-gfw')
+@rule.command('gfw-update')
 @click.option('-u', '--url', default=common.GFW_LIST_URL)
 @click.option('-r', '--rule-path', default=common.DEFAULT_RULE_PATH)
 @click.option('--timeout', default=10)
