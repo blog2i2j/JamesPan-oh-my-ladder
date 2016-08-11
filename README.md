@@ -6,3 +6,28 @@ These days I am tired of keep configuration of all these Apps sync. So, that's w
 
 oh-my-ladder is a configuration generator with plugin architecture, so both developer and user can get benefit from it.
 
+## Install
+
+install the latest code
+
+```bash
+sudo pip install -U git+https://github.com/JamesPan/oh-my-ladder.git
+```
+
+or a stable release
+
+```bash
+sudo pip install https://github.com/JamesPan/oh-my-ladder/archive/0.0.1.zip
+```
+
+## Usage
+
+Generate configuration for Surge with default template.
+
+```
+ladder gen-cfg surge
+```
+
+
+
+
