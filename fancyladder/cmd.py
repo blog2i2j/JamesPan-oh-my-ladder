@@ -7,14 +7,33 @@ import shutil
 import urllib2
 import errno
 import time
+import ConfigParser
+
+pass_config = click.make_pass_decorator(ConfigParser.ConfigParser)
 
 
 @click.group()
-def rule():
-    pass
+@click.pass_context
+def cli(ctx):
+    parser = ctx.obj
+    config_file = os.environ.get('OML_CONFIG_FILE', False)
+    if config_file == os.devnull:
+        config_file = False
+    if not config_file:
+        user_dir = expenduser('~')
+        if sys.platform.startswith('win') or (sys.platform == 'cli' and os.name == 'nt'):
+            config_basename = 'ladder.ini'
+        else:
+            config_basename = 'ladder.conf'
+        config_dir = os.path.join(user_dir, '.ladder')
+        config_file = os.path.join(config_dir, config_basename)
+
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            parser.readfp(f)
 
 
-@rule.command('rule-cp')
+@cli.command('rule-cp')
 @click.option('-f', '--force', is_flag=True, default=False, help='force copy to dst, may lost previous data')
 @click.argument('dst', type=click.Path(exists=False))
 def copy(force, dst):
@@ -23,12 +42,25 @@ def copy(force, dst):
     base_copy(common.DEFAULT_RULE_PATH, dst, force, '%s already exist, use -f flag to force overwrite' % dst)
 
 
-@rule.command('gfw-update')
+@cli.command('gfw-update')
 @click.option('-u', '--url', default=common.GFW_LIST_URL, help='url of gwflist.txt')
 @click.option('-r', '--rule-path', default=common.DEFAULT_RULE_PATH, help='path contains proxy rules')
 @click.option('--timeout', default=0, type=int, help='timeout fetching gfwlist.txt in seconds')
-def update(url, rule_path, timeout):
+@pass_config
+def update(config, url, rule_path, timeout):
     """update local gfwlist"""
+
+    if config.has_section('global'):
+        if config.has_option('global', 'rule-path'):
+            candidate = config.get('global', 'rule-path')
+            if rule_path == common.DEFAULT_RULE_PATH:
+                rule_path = candidate
+        if config.has_option('global', 'gfwlist-url'):
+            candidate = config.get('global', 'gfwlist-url')
+            if url == common.GFW_LIST_URL:
+                url = candidate
+
+    rule_path = os.path.abspath(expenduser(rule_path))
 
     if not os.path.exists(rule_path):
         try:
@@ -59,12 +91,7 @@ def update(url, rule_path, timeout):
         raise click.ClickException('get HTTP Status Code %s from %s' % (e.code, url))
 
 
-@click.group()
-def plugin():
-    pass
-
-
-@plugin.command('plugin-cp')
+@cli.command('plugin-cp')
 @click.option('-f', '--force', is_flag=True, default=False, help='force copy to dst, may lost previous data')
 @click.argument('dst', type=click.Path(exists=False))
 def copy(force, dst):
@@ -73,24 +100,31 @@ def copy(force, dst):
     base_copy(common.DEFAULT_PLUGIN_PATH, dst, force, '%s already exist, use -f flag to force overwrite' % dst)
 
 
-@click.group()
-def biz():
-    pass
-
-
-@biz.command('gen-cfg')
+@cli.command('gen-cfg')
 @click.option('-r', '--rule-path', default=common.DEFAULT_RULE_PATH, help='path contains proxy rules')
 @click.option('-p', '--plugin-paths', default=[common.DEFAULT_PLUGIN_PATH], multiple=True, help='path to find plugins')
 @click.option('-o', '--output-to', default=sys.stdout, help='path to save configuration, write to stdout by default')
 @click.argument('ladder')
-def generate(rule_path, plugin_paths, output_to, ladder):
+@pass_config
+def generate(config, rule_path, plugin_paths, output_to, ladder):
     """generate configuration"""
+
+    if config.has_section('global'):
+        if config.has_option('global', 'rule-path'):
+            candidate = config.get('global', 'rule-path')
+            if rule_path == common.DEFAULT_RULE_PATH:
+                rule_path = candidate
+        if config.has_option('global', 'plugin-paths'):
+            candidate = config.get('global', 'plugin-paths')
+            candidate = map(str.strip, candidate.split(','))
+            if plugin_paths == [common.DEFAULT_PLUGIN_PATH]:
+                plugin_paths = candidate
 
     from framework import LadderFramework
     from ladder import LadderException
 
-    rule_path = os.path.abspath(rule_path)
-    plugin_paths = map(os.path.abspath, plugin_paths)
+    rule_path = os.path.abspath(expenduser(rule_path))
+    plugin_paths = map(lambda p: os.path.abspath(expenduser(p)), plugin_paths)
 
     framework = LadderFramework(rule_path, plugin_paths)
     try:
@@ -119,8 +153,15 @@ def base_copy(src, dst, force, on_fail_msg):
     shutil.copytree(src, dst)
 
 
+def expenduser(path):
+    expended = os.path.expanduser(path)
+    if path.startswith('~/') and expended.startswith('//'):
+        expended = expended[1:]
+    return expended
+
+
 def main():
-    click.CommandCollection(sources=[rule, plugin, biz])()
+    click.CommandCollection(sources=[cli(obj=ConfigParser.ConfigParser())])()
 
 
 if __name__ == '__main__':
