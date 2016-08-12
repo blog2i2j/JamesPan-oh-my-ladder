@@ -3,17 +3,19 @@ ruleSets:
   rules:
 {% for domain in user_rule %}
   - DOMAIN-MATCH,{{ domain }},PROXY
-{% end for %}
+{% endfor %}
   - DOMAIN-SUFFIX,evernote.com,PROXY
   - DOMAIN-SUFFIX,yinxiang.com,PROXY
 {% for domain in gfwlist %}
   - DOMAIN-MATCH,{{ domain }},PROXY
-{% end for %}
+{% endfor %}
+
 - name: rule-reject
   rules:
 {% for rule in rule_reject %}
   - {{ rule }}
-{% end for %}
+{% endfor %}
+
 - name: const
   rules:
   - IP-CIDR,91.108.56.0/22,PROXY

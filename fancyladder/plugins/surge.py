@@ -24,6 +24,7 @@ class Surge(ladder.Ladder):
         }
 
         rendered = env.get_template('surge.conf').render(**context)
+
         return {
             'surge.conf': rendered
         }

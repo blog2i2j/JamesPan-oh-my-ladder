@@ -4,9 +4,9 @@ from jinja2 import Environment, FileSystemLoader
 import os
 
 
-class potatso(ladder.Ladder):
+class Potatso(ladder.Ladder):
     def __init__(self):
-        super(potatso, self).__init__()
+        super(Potatso, self).__init__()
         self._id = 'potatso'
 
     def id(self):
@@ -16,12 +16,10 @@ class potatso(ladder.Ladder):
         rule_path = kwargs['rule_path']
         template_path = os.path.join(rule_path, self._id)
 
+        env = Environment(loader=FileSystemLoader(template_path), trim_blocks=True)
+
         with open(os.path.join(template_path, 'rule-reject.txt')) as f:
-            lines = f.readlines()
-
-
-        env = Environment(loader=FileSystemLoader(template_path),
-                          trim_blocks=True)
+            lines = map(str.strip, f.readlines())
 
         context = {
             'gfwlist': kwargs['gfwlist_proxy_domain'],
@@ -30,6 +28,7 @@ class potatso(ladder.Ladder):
         }
 
         rendered = env.get_template('potatso.conf').render(**context)
+
         return {
             'potatso.conf': rendered
         }
