@@ -1,0 +1,9 @@
+[Core]
+Name = Potatso as a Ladder
+Module = potatso
+
+[Documentation]
+Description = Potatso as a Ladder
+Author = Abbey
+Version = 1.0
+Website = https://potatso.com/
