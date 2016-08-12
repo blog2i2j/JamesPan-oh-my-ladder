@@ -117,7 +117,7 @@ def generate(config, rule_path, plugin_paths, output_to, ladder):
         if config.has_option('global', 'plugin-paths'):
             candidate = config.get('global', 'plugin-paths')
             candidate = map(str.strip, candidate.split(','))
-            if plugin_paths == [common.DEFAULT_PLUGIN_PATH]:
+            if plugin_paths == (common.DEFAULT_PLUGIN_PATH,):
                 plugin_paths = candidate
 
     from framework import LadderFramework
