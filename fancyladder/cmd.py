@@ -15,18 +15,18 @@ def rule():
 
 
 @rule.command('rule-cp')
-@click.option('-f', '--force', is_flag=True, default=False)
+@click.option('-f', '--force', is_flag=True, default=False, help='force copy to dst, may lost previous data')
 @click.argument('dst', type=click.Path(exists=False))
 def copy(force, dst):
-    """copy default rules"""
+    """copy default rules to destination path"""
 
     base_copy(common.DEFAULT_RULE_PATH, dst, force, '%s already exist, use -f flag to force overwrite' % dst)
 
 
 @rule.command('gfw-update')
-@click.option('-u', '--url', default=common.GFW_LIST_URL)
-@click.option('-r', '--rule-path', default=common.DEFAULT_RULE_PATH)
-@click.option('--timeout', default=10)
+@click.option('-u', '--url', default=common.GFW_LIST_URL, help='url of gwflist.txt')
+@click.option('-r', '--rule-path', default=common.DEFAULT_RULE_PATH, help='path contains proxy rules')
+@click.option('--timeout', default=0, type=int, help='timeout fetching gfwlist.txt in seconds')
 def update(url, rule_path, timeout):
     """update local gfwlist"""
 
@@ -40,7 +40,10 @@ def update(url, rule_path, timeout):
                 raise
 
     try:
-        response = urllib2.urlopen(url, timeout=timeout)
+        params = {}
+        if timeout > 0:
+            params['timeout'] = timeout
+        response = urllib2.urlopen(url, **params)
         body = response.read()
         response.close()
 
@@ -62,10 +65,10 @@ def plugin():
 
 
 @plugin.command('plugin-cp')
-@click.option('-f', '--force', is_flag=True, default=False)
+@click.option('-f', '--force', is_flag=True, default=False, help='force copy to dst, may lost previous data')
 @click.argument('dst', type=click.Path(exists=False))
 def copy(force, dst):
-    """copy default plugins"""
+    """copy default plugins to destination path"""
 
     base_copy(common.DEFAULT_PLUGIN_PATH, dst, force, '%s already exist, use -f flag to force overwrite' % dst)
 
@@ -76,9 +79,9 @@ def biz():
 
 
 @biz.command('gen-cfg')
-@click.option('-r', '--rule-path', default=common.DEFAULT_RULE_PATH)
-@click.option('-p', '--plugin-paths', default=[common.DEFAULT_PLUGIN_PATH], multiple=True)
-@click.option('-o', '--output-to', default=sys.stdout)
+@click.option('-r', '--rule-path', default=common.DEFAULT_RULE_PATH, help='path contains proxy rules')
+@click.option('-p', '--plugin-paths', default=[common.DEFAULT_PLUGIN_PATH], multiple=True, help='path to find plugins')
+@click.option('-o', '--output-to', default=sys.stdout, help='path to save configuration, write to stdout by default')
 @click.argument('ladder')
 def generate(rule_path, plugin_paths, output_to, ladder):
     """generate configuration"""
