@@ -1,0 +1,7 @@
+proxies:
+- name: default
+  type: SS
+  host: HOST
+  port: PORT
+  encryption: aes-256-cfb
+  password: PASSWORD
